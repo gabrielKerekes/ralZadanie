@@ -51,7 +51,7 @@ int main()
 		cin >> pol[i-1];
 	}
 	
-	if (indivisibility(num_pol, pol))
+	if (indivisibility(num_pol, pol))         // function verfies indivisibility of polynomials in array
 		cout << "Su delitelne medzi sebou";
 	else
 		cout << "Niesu delitelne medzi sebou";
