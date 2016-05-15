@@ -34,7 +34,7 @@ int main()
 	cout << "[min 2 , max 7]Kolko polynomov chces nacitat: ";
 	cin >> num_pol;
 	
-	ZZ_pX *pol=new ZZ_pX[num_pol];
+	ZZ_pX *pol=new ZZ_pX[num_pol];			//array of polynomials
 
 	if (num_pol < 1){
 		cout << "Zadali ste zly vstup to je malo";
@@ -57,10 +57,6 @@ int main()
 		cout << "Niesu delitelne medzi sebou";
 
 
-//	for (int j = 0; j < num_pol; j++){
-	//	cout << pol[j] << endl;
-	//}
-
 
 	getchar();
 	return 0;
@@ -69,16 +65,16 @@ int main()
 
 bool indivisibility(int num_pol, ZZ_pX *pol){
 	ZZX result;
-	double vOne = 1;//value 1
+	double vOne = 1;		//value 1
 	int tmp = num_pol;
 
 	for (int j = 0; j < num_pol; j++){
 
 		for (int i = 0 + j; i < tmp; i++){
 
-			GCDx(result, conv<ZZX>(pol[j]), conv<ZZX>(pol[i]));			//gcd of two polynomials
+			GCDx(result, conv<ZZX>(pol[j]), conv<ZZX>(pol[i]));	//gcd of two polynomials
 			
-			if (conv<ZZX>(vOne) == result)								//test if GCD of polynomials are 1
+			if (conv<ZZX>(vOne) == result)			//test if GCD of polynomials are 1
 				return true;
 		}
 	}
