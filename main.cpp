@@ -7,6 +7,9 @@
 #include <NTL/vec_GF2E.h>
 #include <NTL/ZZX.h>
 #include <vector>
+#include <string>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 using namespace NTL;
@@ -14,6 +17,7 @@ using namespace NTL;
 NTL_CLIENT
 void GCDx(ZZX& d, const ZZX& a, const ZZX& b);
 bool indivisibility(int num_pol, vector<ZZ_pX> pol);
+void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX> y, vector<ZZ_pX> bMy);
 
 int main()
 {
@@ -160,8 +164,61 @@ int main()
 	rem(remainderResult, sum, MProduct);
 	cout << endl << endl << "FINAL: " << remainderResult << endl << endl;
 
+	printTable(m, b, M, y, bMy);
+
 	getchar();
 	return 0;
+}
+//2 2 [0 1] [1 1 1] [1 0 1] [1 1 0 1]
+void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX> y, vector<ZZ_pX> bMy)
+{
+	cout << left << setw(4) << "i";
+	for (int i = 0; i < m.size(); i++)
+	{
+		cout << left << setw(15) << i;
+	}
+	cout << endl << left << setw(4) << "m";
+
+	for (int i = 0; i < m.size(); i++)
+	{
+		stringstream ss;
+		ss << m[i];
+		cout << left << setw(15) << ss.str();
+	}
+	cout << endl << left << setw(4) << "b";
+
+	for (int i = 0; i < b.size(); i++)
+	{
+		stringstream ss;
+		ss << b[i];
+		cout << left << setw(15) << ss.str();
+	}
+	cout << endl << left << setw(4) << "M";
+
+	for (int i = 0; i < b.size(); i++)
+	{
+		stringstream ss;
+		ss << M[i];
+		cout << left << setw(15) << ss.str();
+	}
+	cout << endl << left << setw(4) << "y";
+
+	for (int i = 0; i < b.size(); i++)
+	{
+		stringstream ss;
+		ss << y[i];
+		cout << left << setw(15) << ss.str();
+	}
+	cout << endl << left << setw(4) << "bMy";
+
+	for (int i = 0; i < b.size(); i++)
+	{
+		stringstream ss;
+		ss << bMy[i];
+		cout << left << setw(15) << ss.str();
+	}
+
+	cout << endl;
 }
 
 bool indivisibility(int num_pol, vector<ZZ_pX> pol)
