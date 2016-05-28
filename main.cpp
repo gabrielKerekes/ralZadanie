@@ -10,6 +10,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <list>
 
 using namespace std;
 using namespace NTL;
@@ -19,6 +20,9 @@ void GCDx(ZZX& d, const ZZX& a, const ZZX& b);
 bool indivisibility(int num_pol, vector<ZZ_pX> pol);
 void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX> y, vector<ZZ_pX> bMy);
 vector<vector<ZZ_pX>> generateRandomCongruences(int n);
+void factors(long long n);
+bool overPole();
+list<int> elem;
 
 int main()
 {
@@ -30,6 +34,12 @@ int main()
 	int f;			//field or ring
 	cout << "Definuj P:";
 	cin >> f;
+	factors(f);
+	if (!overPole()){
+		cout << "Zle zadane pole musis este raz";
+		return 0;
+	}
+
 	ZZ_p::init(ZZ(f));
 
 	cout << "[min 2 , max 7] Kolko kongruencii chces nacitat: ";
@@ -246,6 +256,51 @@ vector<vector<ZZ_pX>> generateRandomCongruences(int n)
 }
 
 //2 2 1 [0 1] [1 1 1] [1 0 1] [1 1 0 1]
+void factors(long long n)
+{
+	long long z = 2;
+	int i = 0;
+
+	while (z * z <= n)
+	{
+		if (n % z == 0)
+		{
+			//cout << z << endl;
+			elem.push_back(z);
+			n /= z;
+		}
+		else
+		{
+			z++;
+		}
+	}
+	if (n > 1)
+	{
+		//cout << n << endl;
+		elem.push_back(n);
+	}
+}
+
+bool overPole(){
+	int tmp;
+	bool tmp2 = true;;
+	tmp = elem.front();
+	elem.pop_front();
+
+	for (std::list<int>::iterator it = elem.begin(); it != elem.end(); it++){
+	//	cout << *it << " ";
+		if (tmp != (*it)){
+			tmp2 = false;
+		}
+		else{
+			tmp2 = true;
+		}
+
+	}
+
+	return tmp2;
+}
+
 void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX> y, vector<ZZ_pX> bMy)
 {
 	cout << left << setw(4) << "i";
