@@ -16,6 +16,7 @@ Stlačte ENTER.
 
 3. Zobrazí sa Vám menu s možnosťou vygenerovania kongruencie automaticky voľba č.1, alebo si kongruencie budete zadávať sami-manuálne, voľba č.2. 
 Zadávanie kongruencie je nasledovné: napr.   "[2 10 14 6] [4 5 6]" ==> f(x) = (2 + 10*X + 14*x^2 +6*X^3) mod (4 + 5x + 6x^2) ==> f(x) = b(x) mod m(x)
+Náhodne sa generujú polynómi maximálne stupňa 8.
 	
 4.POZOR!! Pri zadávaní kongruencii, polynómi m (druhé zadávané polynómi pri zadávaní kongruencie) musia byť po dvojiciach nesúdeliteľné
 
