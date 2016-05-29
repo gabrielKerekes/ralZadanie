@@ -1,13 +1,9 @@
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/ZZ_pEXFactoring.h>
 #include <NTL/ZZX.h>
-#include <cassert>
-#include "NTL/ZZ.h"
 #include <NTL/GF2E.h>
 #include <NTL/vec_GF2E.h>
-#include <NTL/ZZX.h>
 #include <vector>
-#include <string>
 #include <iomanip>
 #include <sstream>
 #include <list>
@@ -16,51 +12,39 @@ using namespace std;
 using namespace NTL;
 
 NTL_CLIENT
-void GCDx(ZZX& d, const ZZX& a, const ZZX& b);
 bool indivisibility(int num_pol, vector<ZZ_pX> pol);
 void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX> y, vector<ZZ_pX> bMy);
 vector<vector<ZZ_pX>> generateRandomCongruences(int n);
-void factors(long long n);
-bool overPole();
-list<int> elem;
+bool isPrime(long long n);
+int getMaxDeg(vector<ZZ_pX> polynomials);
 
 int main()
 {
-	Vec<ZZ_p> vec_ZZ_p;
-	//ZZ_p::init(ZZ(3)); // define GF(p)
-	//ZZ_pX z;
+	int numOfCongruences;
+	int p;
 
-	int num_pol;	//number of polynomials
-	int f;			//field or ring
-	cout << "Definuj P:";
-	cin >> f;
-	factors(f);
-	if (!overPole()){
-		cout << "Zle zadane pole musis este raz";
-		return 0;
+	cout << "Zadajte P pre pole Fp: ";
+	cin >> p;
+
+	while (!isPrime(p))
+	{
+		cout << "Zadali ste zlé číslo. Zadané číslo musí byť prvočíslo." << endl;
+
+		cout << "Zadajte P pre pole Fp: ";
+		cin >> p;
 	}
 
-	ZZ_p::init(ZZ(f));
+	ZZ_p::init(ZZ(p));
 
-	cout << "[min 2 , max 7] Kolko kongruencii chces nacitat: ";
-	cin >> num_pol;
+	cout << "Koľko kongruencií chcete načítať/vygenerovať (min 2, max 7):  ";
+	cin >> numOfCongruences;
 
-    vector<ZZ_pX> m;
-    vector<ZZ_pX> b;
-    vector<ZZ_pX> M;
-    vector<ZZ_pX> y;
-    vector<ZZ_pX> bMy;
-
-	if (num_pol < 2)
+	while (numOfCongruences < 2 || numOfCongruences > 7)
     {
-		cout << "Zadali ste zly vstup to je malo";
-		return 0;
-	}
+		cout << "Zadali ste zlý počet kongruencií." << endl;
 
-	if (num_pol > 7)
-    {
-		cout << "Zadali ste zly vstup to je vela";
-		return 0;
+		cout << "Koľko kongruencií chcete načítať/vygenerovať (min 2, max 7):  ";
+		cin >> numOfCongruences;
 	}
 
 	int choice;
@@ -71,39 +55,64 @@ int main()
 	cout << "Voľba: ";
 	cin >> choice;
 
+	while (choice < 1 || choice > 2)
+	{
+		cout << "Nesprávna voľba!" << endl;
+
+		cout << "Voľba: ";
+		cin >> choice;
+	}
+
+	vector<ZZ_pX> m;
+	vector<ZZ_pX> b;
+	vector<ZZ_pX> M;
+	vector<ZZ_pX> y;
+	vector<ZZ_pX> bMy;
+
 	if (choice == 1)
 	{
-		for (int i = 1; i <= num_pol; i++)
+		for (int i = 1; i <= numOfCongruences; i++)
 		{
 			ZZ_pX bi, mi;
 
 			cout << "Zadaj " << i << ". kongruenciu:";
-			//cin >> pol[i-1];
 			cin >> bi >> mi;
 			m.push_back(mi);
 			b.push_back(bi);
 		}
 
-		if (indivisibility(num_pol, m))
-			cout << "Su delitelne medzi sebou" << endl;
-		else
-			cout << "Niesu delitelne medzi sebou" << endl;
+		while (!indivisibility(numOfCongruences, m))
+		{
+			cout << "Polynómi (m) musia byť medzi sebou nesúdeliteľné!" << endl;
+
+			for (int i = 1; i <= numOfCongruences; i++)
+			{
+				ZZ_pX bi, mi;
+
+				cout << "Zadaj " << i << ". kongruenciu:";
+				cin >> bi >> mi;
+				m.push_back(mi);
+				b.push_back(bi);
+			}
+		}
+
+		cout << "Vstup O.K." << endl;
 	}
 	else
 	{
-		auto congruences = generateRandomCongruences(num_pol);
+		auto congruences = generateRandomCongruences(numOfCongruences);
 
 		m = congruences[0];
 		b = congruences[1];
 	}
 
 	//VYPOCITA Mi
-    for (int i = 0; i < num_pol; i++)
+    for (int i = 0; i < numOfCongruences; i++)
     {
         ZZ_pX Mi;
         bool isMInitialized = false;
 
-        for (int j = 0; j < num_pol; j++)
+        for (int j = 0; j < numOfCongruences; j++)
         {
             if (i != j)
             {
@@ -114,65 +123,29 @@ int main()
                 }
                 else
                 {
-					cout << "Mi = " << Mi << endl;
-					cout << "M[j] = " << m[j] << endl;
-
                     Mi *= m[j];
                 }
             }
         }
 
         M.push_back(Mi);
-		//cout << Mi << " " << m[i] << endl;
 		ZZ_pX invModResult, remainderResult;
-		//cout << endl << "DEG M: " << deg(Mi) << " DEG m[i]: " << deg(m[i]) << endl;
 
 		rem(remainderResult, Mi, m[i]);
-
-		/*while (!indivisibility(2, vector<ZZ_pX>{remainderResult, m[i]}))
-		{
-			auto newRemainderResult = remainderResult;
-			rem(remainderResult, m[i], newRemainderResult);
-			cout << "remaindering again" << endl;
-		}*/
-
-		//cout << "REM: " << remainderResult << endl;
-		cout << "REM: " << remainderResult << " m[i]: " << m[i] << endl;
 		InvMod(invModResult, remainderResult, m[i]);
-		//cout << endl << "INVMOD: " << invModResult << endl;
+
 		y.push_back(invModResult);
     }
 
-	cout << "M: ";
-    for (int i = 0; i < num_pol; i++)
-    {
-        cout << M[i] << " ";
-    }
-	cout << endl;
-
-	cout << "y: ";
-	for (int i = 0; i < num_pol; i++)
-	{
-		cout << y[i] << " ";
-	}
-	cout << endl;
-
-	for (int i = 0; i < num_pol; i++)
+	for (int i = 0; i < numOfCongruences; i++)
 	{
 		bMy.push_back(b[i]*M[i]*y[i]);
 	}
 
-	cout << "y: ";
-	for (int i = 0; i < num_pol; i++)
-	{
-		cout << bMy[i] << " ";
-	}
-	cout << endl;
-
 	//VYPOCITA ZAVERECNE f(x)
 	ZZ_pX sum;
 	bool sumInitialized = false;
-	for (int i = 0; i < num_pol; i++)
+	for (int i = 0; i < numOfCongruences; i++)
 	{
 		if (!sumInitialized)
 		{
@@ -184,10 +157,11 @@ int main()
 			sum += bMy[i];
 		}
 	}
+
 	//VYPOCITA M
 	ZZ_pX MProduct;
 	bool MProductInitialized = false;
-	for (int i = 0; i < num_pol; i++)
+	for (int i = 0; i < numOfCongruences; i++)
 	{
 		if (!MProductInitialized)
 		{
@@ -199,13 +173,14 @@ int main()
 			MProduct *= m[i];
 		}
 	}
-	//VYSLEDOK
-	ZZ_pX remainderResult;
-	//cout << endl << "DEG M: " << deg(Mi) << " DEG m[i]: " << deg(m[i]) << endl;
-	rem(remainderResult, sum, MProduct);
-	cout << endl << endl << "FINAL: " << remainderResult << endl << endl;
 
 	printTable(m, b, M, y, bMy);
+
+	//VYSLEDOK
+	ZZ_pX remainderResult;
+
+	rem(remainderResult, sum, MProduct);
+	cout << endl << endl << "f(x) = " << remainderResult << endl << endl;
 
 	getchar();
 	return 0;
@@ -218,7 +193,7 @@ vector<vector<ZZ_pX>> generateRandomCongruences(int n)
 
 	for (int i = 0; i < n; i++)
 	{
-		ZZ_pX generated = random_ZZ_pX(4);//BuildIrred_ZZ_pX(4);//random_ZZ_pX(4);
+		ZZ_pX generated = random_ZZ_pX(8);
 
 		m.push_back(generated);
 
@@ -227,11 +202,10 @@ vector<vector<ZZ_pX>> generateRandomCongruences(int n)
 		while (!indivisibility(i + 1, m) && j < 100 || m.back() == conv<ZZ_pX>(1) || m.back() == conv<ZZ_pX>(0))
 		{
 			m.pop_back();
-			generated = random_ZZ_pX(4);//BuildIrred_ZZ_pX(4);//random_ZZ_pX(4);
+			generated = random_ZZ_pX(8);
 			m.push_back(generated);
 			j++;
 		}
-		cout << "J == " << j << endl << endl;
 
 		if (j == 100)
 		{
@@ -241,13 +215,8 @@ vector<vector<ZZ_pX>> generateRandomCongruences(int n)
 			continue;
 		}
 
-		generated = random_ZZ_pX(4);//BuildIrred_ZZ_pX(4);//random_ZZ_pX(4);
+		generated = random_ZZ_pX(8);
 		b.push_back(generated);
-	}
-
-	for (int k = 0; k < m.size(); k++)
-	{
-		cout << m[k] << endl;
 	}
 
 	auto returnValue = vector<vector<ZZ_pX>>(2);
@@ -256,97 +225,95 @@ vector<vector<ZZ_pX>> generateRandomCongruences(int n)
 }
 
 //2 2 1 [0 1] [1 1 1] [1 0 1] [1 1 0 1]
-void factors(long long n)
+bool isPrime(long long n)
 {
 	long long z = 2;
-	int i = 0;
 
 	while (z * z <= n)
 	{
 		if (n % z == 0)
-		{
-			//cout << z << endl;
-			elem.push_back(z);
-			n /= z;
-		}
-		else
-		{
-			z++;
-		}
+			return false;
+
+		z++;
 	}
-	if (n > 1)
-	{
-		//cout << n << endl;
-		elem.push_back(n);
-	}
+
+	return true;
 }
 
-bool overPole(){
-	int tmp;
-	bool tmp2 = true;;
-	tmp = elem.front();
-	elem.pop_front();
+int getMaxDeg(vector<ZZ_pX> polynomials)
+{
+	int maxDeg = 0;
 
-	for (std::list<int>::iterator it = elem.begin(); it != elem.end(); it++){
-	//	cout << *it << " ";
-		if (tmp != (*it)){
-			tmp2 = false;
-		}
-		else{
-			tmp2 = true;
-		}
+	for (int i = 0; i < polynomials.size(); i++)
+	{
+		auto currentDeg = deg(polynomials[i]);
 
+		if (currentDeg > maxDeg)
+		{
+			maxDeg = currentDeg;
+		}
 	}
 
-	return tmp2;
+	return maxDeg;
 }
 
 void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX> y, vector<ZZ_pX> bMy)
 {
-	cout << left << setw(4) << "i";
+	int columnHeadWidth = 6;
+	int columnWidth = getMaxDeg(bMy)*2 + 5;
+
+	cout << endl << endl << left << setw(columnHeadWidth) << "i";
 	for (int i = 0; i < m.size(); i++)
 	{
-		cout << left << setw(15) << i;
+		cout << left << setw(columnWidth) << i;
 	}
-	cout << endl << left << setw(4) << "m";
 
+	cout << endl;
+	for (int i = 0; i < m.size(); i++)
+	{
+		cout.fill('-');
+		cout << left << setw(columnWidth) << "";
+	}
+	cout.fill(' ');
+
+	cout << endl << left << setw(columnHeadWidth) << "m";
 	for (int i = 0; i < m.size(); i++)
 	{
 		stringstream ss;
 		ss << m[i];
-		cout << left << setw(15) << ss.str();
+		cout << left << setw(columnWidth) << ss.str();
 	}
-	cout << endl << left << setw(4) << "b";
 
+	cout << endl << left << setw(columnHeadWidth) << "b";
 	for (int i = 0; i < b.size(); i++)
 	{
 		stringstream ss;
 		ss << b[i];
-		cout << left << setw(15) << ss.str();
+		cout << left << setw(columnWidth) << ss.str();
 	}
-	cout << endl << left << setw(4) << "M";
 
+	cout << endl << left << setw(columnHeadWidth) << "M";
 	for (int i = 0; i < b.size(); i++)
 	{
 		stringstream ss;
 		ss << M[i];
-		cout << left << setw(15) << ss.str();
+		cout << left << setw(columnWidth) << ss.str();
 	}
-	cout << endl << left << setw(4) << "y";
 
+	cout << endl << left << setw(columnHeadWidth) << "y";
 	for (int i = 0; i < b.size(); i++)
 	{
 		stringstream ss;
 		ss << y[i];
-		cout << left << setw(15) << ss.str();
+		cout << left << setw(columnWidth) << ss.str();
 	}
-	cout << endl << left << setw(4) << "bMy";
 
+	cout << endl << left << setw(columnHeadWidth) << "bMy";
 	for (int i = 0; i < b.size(); i++)
 	{
 		stringstream ss;
 		ss << bMy[i];
-		cout << left << setw(15) << ss.str();
+		cout << left << setw(columnWidth) << ss.str();
 	}
 
 	cout << endl;
@@ -355,7 +322,6 @@ void printTable(vector<ZZ_pX> m, vector<ZZ_pX> b, vector<ZZ_pX> M, vector<ZZ_pX>
 bool indivisibility(int num_pol, vector<ZZ_pX> pol)
 {
 	ZZ_pX result;
-	double vOne = 1;		//value 1
 	int tmp = num_pol;
 
 	ZZ_pX tmp1, tmp2;
@@ -366,95 +332,10 @@ bool indivisibility(int num_pol, vector<ZZ_pX> pol)
         {
 			XGCD(result, tmp1, tmp2, pol[j], pol[i]);
 			
-			if (conv<ZZ_pX>(vOne) != result)
+			if (conv<ZZ_pX>(1) != result)
 				return false;
 		}
 	}
 
 	return true;
-}
-
-void GCDx(ZZX& d, const ZZX& a, const ZZX& b)
-{
-	if (a == 0)
-    {
-		d = b;
-		if (LeadCoeff(d) < 0) NTL::negate(d, d);
-		return;
-	}
-
-	if (b == 0)
-    {
-		d = a;
-		if (LeadCoeff(d) < 0) NTL::negate(d, d);
-		return;
-	}
-
-	ZZ c1, c2, c;
-	ZZX f1, f2;
-
-	content(c1, a);
-	divide(f1, a, c1);
-
-	content(c2, b);
-	divide(f2, b, c2);
-
-	GCD(c, c1, c2);
-
-	ZZ ld;
-	GCD(ld, LeadCoeff(f1), LeadCoeff(f2));
-
-	ZZX g, res;
-
-	ZZ prod;
-
-	zz_pPush push; // save current modulus, restore upon return
-
-	long FirstTime = 1;
-
-	long i;
-	for (i = 0;; i++)
-    {
-		zz_p::FFTInit(i);
-		long p = zz_p::modulus();
-
-		if (divide(LeadCoeff(f1), p) || divide(LeadCoeff(f2), p)) continue;
-
-		zz_pX G, F1, F2;
-		zz_p  LD;
-
-		conv(F1, f1);
-		conv(F2, f2);
-		conv(LD, ld);
-
-		GCD(G, F1, F2);
-		mul(G, G, LD);
-
-		if (deg(G) == 0)
-        {
-			res = 1;
-			break;
-		}
-
-		if (FirstTime || deg(G) < deg(g))
-        {
-			prod = 1;
-			g = 0;
-			FirstTime = 0;
-		}
-		else if (deg(G) > deg(g))
-        {
-			continue;
-		}
-
-		if (!CRT(g, prod, G))
-        {
-			PrimitivePart(res, g);
-			if (divide(f1, res) && divide(f2, res))
-				break;
-		}
-	}
-
-	mul(d, res, c);
-	if (LeadCoeff(d) < 0) NTL::negate(d, d);
 }
