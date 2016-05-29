@@ -24,27 +24,29 @@ int main()
 	int p;
 
 	cout << "Zadajte P pre pole Fp: ";
-	cin >> p;
 
-	while (!isPrime(p))
+	while (!(cin >> p) || !isPrime(p))
 	{
 		cout << "Zadali ste zlé číslo. Zadané číslo musí byť prvočíslo." << endl;
 
 		cout << "Zadajte P pre pole Fp: ";
-		cin >> p;
+
+		cin.clear();
+		cin.ignore();
 	}
 
 	ZZ_p::init(ZZ(p));
 
 	cout << "Koľko kongruencií chcete načítať/vygenerovať (min 2, max 7):  ";
-	cin >> numOfCongruences;
 
-	while (numOfCongruences < 2 || numOfCongruences > 7)
+	while (!(cin >> numOfCongruences) || (numOfCongruences < 2 || numOfCongruences > 7))
     {
 		cout << "Zadali ste zlý počet kongruencií." << endl;
 
 		cout << "Koľko kongruencií chcete načítať/vygenerovať (min 2, max 7):  ";
-		cin >> numOfCongruences;
+
+		cin.clear();
+		cin.ignore();
 	}
 
 	int choice;
@@ -53,14 +55,12 @@ int main()
 	cout << "1. Zadať" << endl;
 	cout << "2. Vygenerovať" << endl;
 	cout << "Voľba: ";
-	cin >> choice;
 
-	while (choice < 1 || choice > 2)
+	while (!(cin >> choice) || (choice < 1 || choice > 2))
 	{
 		cout << "Nesprávna voľba!" << endl;
 
 		cout << "Voľba: ";
-		cin >> choice;
 	}
 
 	vector<ZZ_pX> m;

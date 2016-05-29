@@ -14,16 +14,16 @@ Stlačte ENTER.
 
 2. V kroku 2 treba zadať koľko kongruencii chcete načítať. V rozsahu od 2-7.
 
-3. Zobrazí sa Vám menu s možnosťou vygenerovania kongruencie automaticky voľba č.1, alebo si kongruencie budete zadavať sami-manualne, voľba č.2. 
-Zadávanie kongruencie je nasledovné: napr.   "[2 10 14 6]" je  2 + 10*X + 14*x^2 +6*X^3
+3. Zobrazí sa Vám menu s možnosťou vygenerovania kongruencie automaticky voľba č.1, alebo si kongruencie budete zadávať sami-manuálne, voľba č.2. 
+Zadávanie kongruencie je nasledovné: napr.   "[2 10 14 6] [4 5 6]" ==> f(x) = (2 + 10*X + 14*x^2 +6*X^3) mod (4 + 5x + 6x^2) ==> f(x) = b(x) mod m(x)
 	
-4.POZOR!! Pri zadavani kongruencii, kongruencie musia byť navzájom nesúdeliteľné.
+4.POZOR!! Pri zadávaní kongruencii, polynómi m (druhé zadávané polynómi pri zadávaní kongruencie) musia byť po dvojiciach nesúdeliteľné
 
-5.Vo finalnej fáze by ste mali vidieť tabuľku s vypočítanými hodnotami.
+5.Vo finálnej fáze by ste mali vidieť tabuľku s vypočítanými hodnotami.
 
 
 
-Takto by mala vyzerat finalna podoba pri zadaní pola 3 a pri vygenerovaní 3x kongruencií.
+Takto by mala vyzerať finálna podoba pri zadaní pola 3 a pri vygenerovaní 3x kongruencií.
 
 i     0                                                    1                                                    2
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -35,3 +35,20 @@ bMy   [0 2 1 2 2 2 2 1 2 0 2 1 0 0 0 1 0 2 0 2 0 1 1 2 1]  [0 0 2 0 1 0 1 1 0 0 
 
 
 f(x) = [0 0 0 2 1 1 0 0 2 2 2 0 1 1 1 0 1]
+
+
+výstup pri zadaní príkladu z konzultácií (na spustenie tohto scenária stačí spustiť program, nakopírovať doň "2 2 1 [0 1] [1 1 1] [1 0 1] [1 1 0 1]" a stlačiť enter)
+
+f(x) = x mod (x^2 + x + 1)
+f(x) = (x^2 + 1) mod (x^3 + x + 1) 
+
+i     0                1                
+----------------------------------
+m     [1 1 1]          [1 1 0 1]        
+b     [0 1]            [1 0 1]          
+M     [1 1 0 1]        [1 1 1]          
+y     [1 1]            [0 0 1]          
+bMy   [0 1 0 1 1 1]    [0 0 1 1 0 1 1]  
+
+
+f(x) = [1 0 1]
